@@ -1,0 +1,19 @@
+#include BIBLIOTECA_H
+
+struct lista {
+    string _cadeia0 = "ola mundo!"
+    float real35 = 3.09, y = 2.
+
+}
+
+int main(void) {
+    char while_ = 'o'
+
+                //// indentacao errada!!! //
+             if(1) {
+                while(while_){
+                    print(lista + real35)
+                }
+             }
+        return
+}
