@@ -55,7 +55,7 @@ ERRO1_4_1           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE}))
 ERRO1_4_2           (({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~0-9=|]+)
 ERRO1_4_3           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~0-9=|]+)
 ERRO1_4             {ERRO1_4_1}|{ERRO1_4_2}|{ERRO1_4_3}
-ERRO1_PALAVRA       {ERRO1_1}|{ERRO1_2}|{ERRO1_3}|{ERRO1_4}         
+ERRO1_PALAVRA       {ERRO1_1}|{ERRO1_2}|{ERRO1_3}|{ERRO1_4}
 
 ERRO2_1             [!#@$%&*,.;<>:^~0-9]+{IDENTIFICADOR}
 ERRO2_2             {IDENTIFICADOR}[!#@$%&*,.;<>:^~]+
@@ -68,15 +68,12 @@ ERRO3_DIVISAO       ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{DIVISAO}({SO
 ERRO3_SUBTRACAO     ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{SUBTRACAO}({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})*
 ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTIPLICAO})
 
-ERRO4_CHAR          [@$¨_¹²³£¢¬§`^:ªº~]+
-
 %%
 {BRANCO}            {;}
 {EOL}               {linhasArq++;}
 
 {ERRO1_PALAVRA}     {printf("(%d) Erro 1 - palavra reservada mal formada: %s\n", linhasArq, yytext);}
 {ERRO3_OP}          {printf("(%d) Erro 3 - operador mal formado: %s\n", linhasArq, yytext);}
-{ERRO4_CHAR}        {printf("(%d) Erro 4 - caracter invalido: %s\n", linhasArq, yytext);}
 
 {IF}                {inserirReservada(yytext, R);}
 {ELSE}              {inserirReservada(yytext, R);}
