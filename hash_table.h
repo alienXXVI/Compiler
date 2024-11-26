@@ -5,11 +5,11 @@
 
 // Categoria de simbolos
 typedef enum categoria {
-    IDENTIFICADOR,
-    INTEIRO,
-    REAL,
-    CARACTER,
-    STRING,
+    SIMB_IDENTIFICADOR,
+    SIMB_INTEIRO,
+    SIMB_REAL,
+    SIMB_CARACTER,
+    SIMB_STRING,
 } Categoria;
 
 typedef struct noS{

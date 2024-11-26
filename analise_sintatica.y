@@ -1,6 +1,18 @@
 %{
     #include <stdio.h>
+    #include "arvore.h"
+    #include "hash_table.h"
     
+    extern int yylex();
+    extern int yyparse();
+    void yyerror();
+
+    extern FILE *yyin; // Variável para o arquivo de entrada
+    extern int yynerrs;
+    int linhasArq = 1;
+
+    TabelaSimbolo *T;
+    TabelaReservada *R;
 %}
 
 %union {
@@ -15,14 +27,14 @@
 %token  <string> IDENTIFICADOR CADEIA FILE_NAME
 %token  <caractere> CARACTER
 
-%token  IF ELSE WHILE FOR DO SWITCH CASE RETURN
+%token  IF ELSE WHILE FOR DO SWITCH CASE RETURN BREAK DEFAULT
 %token  INT FLOAT CHAR VOID STRING
 %token  STRUCT ENUM DEFINE INCLUDE
 %token  SCAN PRINT
 %token  SOMA MULTIPLICACAO DIVISAO SUBTRACAO RECEBE
 %token  IGUAL DIFERENTE MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL
 %token  E_LOGICO OU_LOGICO NOT_LOGICO
-%token  ABRE_P FECHA_P ABRE_CH FECHA_CH ABRE_COL FECHA_COL VIRGULA
+%token  ABRE_P FECHA_P ABRE_CH FECHA_CH ABRE_COL FECHA_COL VIRGULA ASPAS_DUPLAS DOIS_PONTOS PONTO_VIRGULA
 
 %%
 
@@ -36,8 +48,8 @@ sentencas_include:
     // vazio
     ;
 sentenca_include:
-    menor nome_arquivo maior |
-    aspas_duplas nome_arquivo aspas_duplas
+    include menor nome_arquivo maior |
+    include aspas_duplas nome_arquivo aspas_duplas
     ;
 
 // Define
@@ -98,7 +110,7 @@ comando:
 decl_var:
     tipo_dado identificador |
     tipo_dado atribuicao |
-    tipo dado identificador virgula decl_var |
+    tipo_dado identificador virgula decl_var |
     tipo_dado atribuicao virgula decl_var
     ;
 
@@ -169,7 +181,7 @@ sentenca_switch:
     switch abre_p expressao fecha_p abre_ch cases fecha_ch
     ;
 cases:
-    sentenca_case+ |
+    sentenca_case cases |
     default |
     // vazio
     ;
@@ -192,7 +204,7 @@ include: INCLUDE;
 define: DEFINE
 nome_arquivo: FILE_NAME;
 
-tipo_dado: INT | FLOAT | CHAR | VOID | STRING;
+tipo_dado: int | float | char | void | string;
 int: INT;
 float: FLOAT;
 char: CHAR;
@@ -206,7 +218,7 @@ caracter: CARACTER;
 cadeia: CADEIA;
 identificador: IDENTIFICADOR;
 
-op_aritmeticos: soma | subtracao | multiplicacao | divisao;
+op_aritmetico: soma | subtracao | multiplicacao | divisao;
 soma: SOMA;
 subtracao: SUBTRACAO;
 multiplicacao: MULTIPLICACAO;
@@ -230,6 +242,8 @@ if: IF;
 else: ELSE;
 switch: SWITCH;
 case: CASE;
+break: BREAK;
+default: DEFAULT;
 
 while: WHILE;
 for: FOR;
@@ -251,3 +265,47 @@ abre_col: ABRE_COL;
 fecha_col: FECHA_COL;
 
 %%
+
+void yyerror(const char *msg) {
+    fprintf(stderr, "Erro: %s\n", msg);
+    exit(1);
+}
+
+int main(int argc, char **argv) {
+    T = iniciarTabelaSimbolo();
+    R = iniciarTabelaReservada();
+
+    if (argc != 2) {
+        fprintf(stderr, "Uso: %s <arquivo_de_entrada>\n", argv[0]);
+        return 1;
+    }
+
+    // Abrindo o arquivo de entrada
+    yyin = fopen(argv[1], "r");
+    if (yyin == NULL) {
+        perror("Erro ao abrir o arquivo");
+        return 1;
+    }
+
+    yyparse();
+
+    // Verifica se houve erro de sintaxe
+    if (yynerrs == 0) {
+        FILE *arquivo = fopen("arvore_derivacao.txt", "w");
+        if (arquivo == NULL) {
+            fprintf(stderr, "Erro ao abrir o arquivo.\n");
+            return 1;
+        }
+
+        // Imprime a árvore no arquivo
+        // fprintf(arquivo, "Árvore de Derivação:\n");
+        // imprimirArvoreArquivo(raiz, 0, arquivo);
+        fclose(arquivo);
+    } else {
+        printf("Erro na análise sintática. Não foi gerado o arquivo.\n");
+    }
+
+    // liberarArvore(raiz);
+    fclose(yyin);
+    return 0;
+}

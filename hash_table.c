@@ -31,12 +31,12 @@ int funcaoHash(int chave) {
 
 const char* getCategoriaNome(Categoria cat) {
     switch (cat) {
-        case IDENTIFICADOR: return "identificador";
-        case INTEIRO:       return "inteiro";
-        case REAL:          return "real";
-        case CARACTER:      return "caracter";
-        case STRING:        return "string";
-        default:            return "desconhecido";
+        case SIMB_IDENTIFICADOR: return "identificador";
+        case SIMB_INTEIRO:       return "inteiro";
+        case SIMB_REAL:          return "real";
+        case SIMB_CARACTER:      return "caracter";
+        case SIMB_STRING:        return "string";
+        default:                return "desconhecido";
     }
 }
 

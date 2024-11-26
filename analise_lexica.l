@@ -7,10 +7,8 @@
     TabelaSimbolo *T;
     TabelaReservada *R;
 
-    int linhasArq = 1;
+    extern int linhasArq = 1;
 %}
-
-%option noyywrap
 
 LETRA               [a-zA-Z]
 DIGITO              [0-9]
@@ -31,6 +29,7 @@ SWITCH              switch
 CASE                case
 BREAK               break
 RETURN              return
+DEFAULT             default
 
 INT                 int
 FLOAT               float
@@ -114,6 +113,7 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {CASE}              {inserirReservada(yytext, R);   return CASE;}
 {BREAK}             {inserirReservada(yytext, R);   return BREAK;}
 {RETURN}            {inserirReservada(yytext, R);   return RETURN;}
+{DEFAULT}           {inserirReservada(yytext, R);   return DEFAULT;}
 
 {INT}               {inserirReservada(yytext, R);   return INT;}
 {FLOAT}             {inserirReservada(yytext, R);   return FLOAT;}
@@ -129,12 +129,12 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {SCAN}              {inserirReservada(yytext, R);   return SCAN;}
 {PRINT}             {inserirReservada(yytext, R);   return PRINT;}
 
-{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  yylval.string = strdup(yytext); return IDENTIFICADOR;}
+{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  yylval.string = (char*) strdup(yytext); return IDENTIFICADOR;}
 {INTEIRO}           {inserirSimbolo(yytext, 1, T);  yylval.inteiro = atoi(yytext); return INTEIRO;}
 {REAL}              {inserirSimbolo(yytext, 2, T);  yylval.real = atof(yytext); return REAL;}
-{CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.caractere = strdup(yytext); return CARACTER;}
-{CADEIA}            {inserirSimbolo(yytext, 4, T);  yylval.string = strdup(yytext); return CADEIA;}
-{FILE_NAME}         {inserirSimbolo(yytext, 4, T);  yylval.string = strdup(yytext); return FILE_NAME;}
+{CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.caractere = (char*) strdup(yytext); return CARACTER;}
+{CADEIA}            {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return CADEIA;}
+{FILE_NAME}         {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return FILE_NAME;}
 
 {COMENTARIO}        {;}
 {SOMA}              {inserirReservada(yytext, R);   return SOMA;}
@@ -168,6 +168,10 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {DOIS_PONTOS}       {inserirReservada(yytext, R);   return DOIS_PONTOS;}
 
 %%
+
+int yywrap(){
+    return 1;
+}
 
 // int main(int argc, char *argv[]) {
 //     T = iniciarTabelaSimbolo();
