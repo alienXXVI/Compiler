@@ -118,4 +118,3 @@ typedef struct reservadas {
     Reservada **tabela;
 } TabelaReservada;
 ```
-```
