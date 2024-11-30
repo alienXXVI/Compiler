@@ -105,7 +105,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 18 "analise_sintatica.y"
+#line 19 "analise_sintatica.y"
 
     int inteiro;
     double real;

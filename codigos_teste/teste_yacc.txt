@@ -1,0 +1,7 @@
+int main() {
+    float x
+    string str1
+
+    x = 2 + 4
+    str1 = 7
+}

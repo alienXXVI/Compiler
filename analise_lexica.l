@@ -7,7 +7,7 @@
     TabelaSimbolo *T;
     TabelaReservada *R;
 
-    extern int linhasArq = 1;
+    extern int linhasArq;
 %}
 
 LETRA               [a-zA-Z]
@@ -123,8 +123,8 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 
 {STRUCT}            {inserirReservada(yytext, R);   return STRUCT;}
 {ENUM}              {inserirReservada(yytext, R);   return ENUM;}
-{DEFINE}            {inserirReservada(yytext, R);   return DEFINE;}
-{INCLUDE}           {inserirReservada(yytext, R);   return INCLUDE;}
+{DEFINE}            {inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return DEFINE;}
+{INCLUDE}           {inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return INCLUDE;}
 
 {SCAN}              {inserirReservada(yytext, R);   return SCAN;}
 {PRINT}             {inserirReservada(yytext, R);   return PRINT;}
@@ -132,7 +132,7 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  yylval.string = (char*) strdup(yytext); return IDENTIFICADOR;}
 {INTEIRO}           {inserirSimbolo(yytext, 1, T);  yylval.inteiro = atoi(yytext); return INTEIRO;}
 {REAL}              {inserirSimbolo(yytext, 2, T);  yylval.real = atof(yytext); return REAL;}
-{CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.caractere = (char*) strdup(yytext); return CARACTER;}
+{CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.caractere = (char) yytext[0]; return CARACTER;}
 {CADEIA}            {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return CADEIA;}
 {FILE_NAME}         {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return FILE_NAME;}
 

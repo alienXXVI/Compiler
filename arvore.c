@@ -1,25 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+
 #include "arvore.h"
 
-// Criar um novo nó
-// Entrada: nome do token (char*)
+// Criar um novo nó com filhos
+// Entrada: nome do nó (char*) seguido de número de filhos e seus nomes
 // Saída: nó criado (NoArvore*)
-NoArvore *criarNo(const char *valor) {
+NoArvore *criarNo(const char *valor, int numFilhos, ...) {
     NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
-    no->valor = strdup(valor); // Aloca memória e copia o valor
-    no->numFilhos = 0;         // Inicialmente, sem filhos
-    no->filhos = NULL;         // Lista de filhos vazia
+    no->valor = strdup(valor);
+    no->numFilhos = numFilhos;
+    no->filhos = (NoArvore **)malloc(numFilhos * sizeof(NoArvore *));
+    
+    va_list args;
+    va_start(args, numFilhos);
+    for (int i = 0; i < numFilhos; i++) {
+        const char *filhoValor = va_arg(args, const char *);
+        no->filhos[i] = criarNo(filhoValor, 0); // Filhos sem filhos próprios inicialmente
+    }
+    va_end(args);
     return no;
 }
 
-// Adicionar um filho à árvore
-// Entrada: ponteiro para o pai e ponteiro para o filho (NoArvore*)
+// Adicionar vários filhos a um nó existente
+// Entrada: nó pai, número de filhos e seus nomes
 // Saída: nenhuma
-void adicionarFilho(NoArvore *pai, NoArvore *filho) {
-    pai->numFilhos++;
-    pai->filhos = (NoArvore **)realloc(pai->filhos, pai->numFilhos * sizeof(NoArvore *));
-    pai->filhos[pai->numFilhos - 1] = filho;
+void adicionarFilhos(NoArvore *pai, int numFilhos, ...) {
+    pai->filhos = (NoArvore **)realloc(pai->filhos, (pai->numFilhos + numFilhos) * sizeof(NoArvore *));
+    
+    va_list args;
+    va_start(args, numFilhos);
+    for (int i = 0; i < numFilhos; i++) {
+        const char *filhoValor = va_arg(args, const char *);
+        pai->filhos[pai->numFilhos + i] = criarNo(filhoValor, 0); // Filhos sem filhos próprios inicialmente
+    }
+    va_end(args);
+    pai->numFilhos += numFilhos;
 }
 
 // Imprimir a árvore em níveis
@@ -36,13 +54,11 @@ void adicionarFilho(NoArvore *pai, NoArvore *filho) {
 */
 void imprimirArvore(NoArvore *no, int nivel) {
     if (no == NULL) return;
-    
-    // Imprime o nó atual
+
+    // Imprimir o nó atual no formato especificado
     for (int i = 0; i < nivel; i++) {
         printf("|  ");
     }
-
-    // Caractere para mostrar as ramificações
     printf("+- %s\n", no->valor);
 
     // Recursão para imprimir os filhos
@@ -51,39 +67,33 @@ void imprimirArvore(NoArvore *no, int nivel) {
     }
 }
 
-
-// Escrever a árvore em um arquivo
-// Entrada: ponteiro para a raíz (NoArvore*) e o nome do arquivo
+// Escrever a árvore em níveis em um arquivo
+// Entrada: ponteiro para a raíz (NoArvore*), profundidade (int) e o arquivo
 // Saída: nenhuma
 void imprimirArvoreArquivo(NoArvore *no, int nivel, FILE *arquivo) {
-    if (no == NULL) return;
-    
-    // Imprime o nó atual no arquivo
+    if (no == NULL || arquivo == NULL) return;
+
+    // Escrever o nó atual no arquivo com o mesmo formato da impressão
     for (int i = 0; i < nivel; i++) {
         fprintf(arquivo, "|  ");
     }
-
-    // Caractere para mostrar as ramificações
     fprintf(arquivo, "+- %s\n", no->valor);
 
-    // Recursão para imprimir os filhos no arquivo
+    // Recursão para os filhos
     for (int i = 0; i < no->numFilhos; i++) {
         imprimirArvoreArquivo(no->filhos[i], nivel + 1, arquivo);
     }
 }
 
 // Liberar memória da árvore
-// Entrada: ponteiro para a raíz (NoArvore)
+// Entrada: nó raiz da árvore
 // Saída: nenhuma
 void liberarArvore(NoArvore *no) {
     if (no == NULL) return;
 
-    // Libera memória dos filhos
     for (int i = 0; i < no->numFilhos; i++) {
         liberarArvore(no->filhos[i]);
     }
-
-    // Libera o valor do nó e o próprio nó
     free(no->valor);
     free(no->filhos);
     free(no);

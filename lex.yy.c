@@ -970,7 +970,7 @@ char *yytext;
     TabelaSimbolo *T;
     TabelaReservada *R;
 
-    extern int linhasArq = 1;
+    extern int linhasArq;
 #line 975 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
@@ -1315,12 +1315,12 @@ YY_RULE_SETUP
 case 22:
 YY_RULE_SETUP
 #line 126 "analise_lexica.l"
-{inserirReservada(yytext, R);   return DEFINE;}
+{inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return DEFINE;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 127 "analise_lexica.l"
-{inserirReservada(yytext, R);   return INCLUDE;}
+{inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return INCLUDE;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
@@ -1350,7 +1350,7 @@ YY_RULE_SETUP
 case 29:
 YY_RULE_SETUP
 #line 135 "analise_lexica.l"
-{inserirSimbolo(yytext, 3, T);  yylval.caractere = (char*) strdup(yytext); return CARACTER;}
+{inserirSimbolo(yytext, 3, T);  yylval.caractere = (char) yytext[0]; return CARACTER;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
