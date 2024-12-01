@@ -1,7 +1,7 @@
 %{
     #include <stdio.h>
-    #include "arvore.h"
-    #include "hash_table.h"
+    #include ".\estruturas\arvore.h"
+    #include ".\estruturas\hash_table.h"
     
     extern int yylex();
     extern int yyparse();
@@ -15,7 +15,10 @@
     PilhaFilhos* pilha = NULL;
     No* arvore = NULL;
     int linhasArq = 1;
+    char *filename = NULL;
+
     char str[200];
+    
 
 %}
 
@@ -253,6 +256,12 @@ comando:
         associarFilhos(no, &pilha, 1);
         empilharFilho(&pilha, no);
     }
+    | break {
+        inserir(&pilha, "comando", 1);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 1);
+        empilharFilho(&pilha, no);
+    }
     | /*vazio*/ {
         inserir(&pilha, "comando", 0);
     } 
@@ -353,6 +362,12 @@ operando:
         associarFilhos(no, &pilha, 1);
         empilharFilho(&pilha, no);
     }
+    | abre_p operando fecha_p {
+        inserir(&pilha, "operando", 3);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 3);
+        empilharFilho(&pilha, no);
+    }
     ;
 op: 
       op_aritmetico {
@@ -401,13 +416,54 @@ sentenca_while:
     }
     ;
 sentenca_for: 
-    for abre_p decl_var ponto_virgula expressao ponto_virgula atribuicao fecha_p corpo {
-        inserir(&pilha, "sentenca_for", 9);
+    for abre_p parametros_for fecha_p corpo {
+        inserir(&pilha, "sentenca_for", 4);
         No* no = desempilharFilho(&pilha);
-        associarFilhos(no, &pilha, 9);
+        associarFilhos(no, &pilha, 4);
         empilharFilho(&pilha, no);
     }
     ;
+parametros_for:
+      parametro_decl_var ponto_virgula parametro_expressao ponto_virgula parametro_atribuicao {
+        inserir(&pilha, "parametros_for", 5);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 5);
+        empilharFilho(&pilha, no);
+      }
+;
+parametro_decl_var:
+      decl_var {
+        inserir(&pilha, "parametro_decl_var", 1);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 1);
+        empilharFilho(&pilha, no);
+      }
+    | /*vazio*/ {
+        inserir(&pilha, "parametro_decl_var", 0);
+    }
+;
+parametro_expressao:
+      expressao {
+        inserir(&pilha, "parametro_expressao", 1);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 1);
+        empilharFilho(&pilha, no);
+      }
+    | /*vazio*/ {
+        inserir(&pilha, "parametro_expressao", 0);
+    }
+;
+parametro_atribuicao:
+      atribuicao {
+        inserir(&pilha, "parametro_atribuicao", 1);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 1);
+        empilharFilho(&pilha, no);
+      }
+    | /*vazio*/ {
+        inserir(&pilha, "parametro_atribuicao", 0);
+    }
+;
 sentenca_do:
     do corpo while abre_p expressao fecha_p {
         inserir(&pilha, "sentenca_do", 6);
@@ -449,7 +505,7 @@ sentenca_print:
     }
     ;
 parametros_print:
-      string parametros_print {
+      cadeia parametros_print {
         inserir(&pilha, "parametros_print", 2);
         No* no = desempilharFilho(&pilha);
         associarFilhos(no, &pilha, 2);
@@ -510,9 +566,9 @@ cases:
     ;
 sentenca_case:
     case literal dois_pontos comandos {
-        inserir(&pilha, "sentenca_case", 5);
+        inserir(&pilha, "sentenca_case", 4);
         No* no = desempilharFilho(&pilha);
-        associarFilhos(no, &pilha, 5);
+        associarFilhos(no, &pilha, 4);
         empilharFilho(&pilha, no);
     }
     ;
@@ -534,9 +590,9 @@ argumentos:
         empilharFilho(&pilha, no);
       }
     | expressao virgula argumentos {
-        inserir(&pilha, "argumentos", 1);
+        inserir(&pilha, "argumentos", 3);
         No* no = desempilharFilho(&pilha);
-        associarFilhos(no, &pilha, 1);
+        associarFilhos(no, &pilha, 3);
         empilharFilho(&pilha, no);
     }
     | /*vazio*/ {
@@ -655,7 +711,7 @@ fecha_ch: FECHA_CH { inserir(&pilha, "}", 0); };
 %%
 
 void yyerror(const char *msg) {
-    fprintf(stderr, "Erro: %s\n", msg);
+    fprintf(stderr, "%s:%d Erro: %s\n", filename, linhasArq, msg);
     exit(1);
 }
 
@@ -668,40 +724,24 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Abrindo o arquivo de entrada
-    yyin = fopen(argv[1], "r");
+    filename = argv[1];
+    yyin = fopen(filename, "r");
     if (yyin == NULL) {
         perror("Erro ao abrir o arquivo");
         return 1;
     }
 
     yyparse();
-    // printf("Tabelas de Tokens:\n");
-    // imprimirTabelaSimbolo(T);
-    // imprimirTabelaReservada(R);
+    imprimirTabelaSimbolo(T);
+    imprimirTabelaReservada(R); 
 
-    printf("\nArvore de Derivacao:\n");
-    imprimirArvore(arvore, 0);  // Imprime a árvore gerada
+    if (yynerrs == 0) {
+        salvarArvoreEmArquivo(arvore, filename);
+    } else {
+        yyerror("Erro sintatico.");
+    }
+
     liberarArvore(arvore);
-    
-
-    // // Verifica se houve erro de sintaxe
-    // if (yynerrs == 0) {
-    //     FILE *arquivo = fopen("arvore_derivacao.txt", "w");
-    //     if (arquivo == NULL) {
-    //         fprintf(stderr, "Erro ao abrir o arquivo.\n");
-    //         return 1;
-    //     }
-
-    //     // Imprime a árvore no arquivo
-    //     // fprintf(arquivo, "Árvore de Derivação:\n");
-    //     // imprimirArvoreArquivo(raiz, 0, arquivo);
-    //     fclose(arquivo);
-    // } else {
-    //     printf("Erro na análise sintática. Não foi gerado o arquivo.\n");
-    // }
-
-    // liberarArvore(raiz);
     fclose(yyin);
     return 0;
 }

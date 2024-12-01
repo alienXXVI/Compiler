@@ -1,7 +1,6 @@
+#include <file.h>
+#define MACRO 12
 
 float soma() {
-    id = x && y
-    id = x || id + (x * 22)
-    all = !10
-    x = !x
+    int x = 1 + 2
 }

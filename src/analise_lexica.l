@@ -1,13 +1,14 @@
 %{
     #include <stdio.h>
     #include <string.h>
-    #include "hash_table.h"
+    #include ".\estruturas\hash_table.h"
     #include "analise_sintatica.tab.h"
 
     TabelaSimbolo *T;
     TabelaReservada *R;
 
-    int linhasArq = 1;
+    extern int linhasArq;
+    extern char *filename;
 %}
 
 LETRA               [a-zA-Z]
@@ -15,8 +16,8 @@ DIGITO              [0-9]
 IDENTIFICADOR       (_|{LETRA})(_|{LETRA}|{DIGITO})*
 NATURAL_SEM_ZERO    [1-9]
 NATURAL             (({NATURAL_SEM_ZERO}{DIGITO}*)|0)
-INTEIRO             [-+]?{NATURAL}
-REAL                {INTEIRO}([.,]{DIGITO}*)?
+INTEIRO             [-]?{NATURAL}
+REAL                {INTEIRO}([.]{DIGITO}*)?
 CARACTER            ('.')|''
 CADEIA              \"[^\"\n]*\"
 
@@ -71,7 +72,6 @@ FECHA_P             ")"
 ABRE_CH             "{"
 FECHA_CH            "}"
 VIRGULA             ","
-ASPAS_DUPLAS        \"
 PONTO_VIRGULA       ";"
 DOIS_PONTOS         ":"
 
@@ -84,9 +84,9 @@ ERRO1_4_3           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~
 ERRO1_4             {ERRO1_4_1}|{ERRO1_4_2}|{ERRO1_4_3}
 ERRO1_PALAVRA       {ERRO1_1}|{ERRO1_2}|{ERRO1_3}|{ERRO1_4}
 
-ERRO2_1             [!#@$%&*.;<>:^~0-9]+{IDENTIFICADOR}
-ERRO2_2             {IDENTIFICADOR}[!#@$%&*.;<>:^~]+
-ERRO2_3             [!#@$%&*,.;<>:^~0-9]+{IDENTIFICADOR}[!#@$%&*,.;<>:^~]+
+ERRO2_1             [#@$%&*.>:^~0-9]+{IDENTIFICADOR}
+ERRO2_2             {IDENTIFICADOR}[!#@$%&*.<:^~]+
+ERRO2_3             [#@$%&*.>:^~0-9]+{IDENTIFICADOR}[!#@$%&*.<:^~]+
 ERRO2_ID            {ERRO2_1}|{ERRO2_2}|{ERRO2_3}
 
 ERRO3_SOMA          ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{SOMA}({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})*
@@ -99,8 +99,8 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {BRANCO}            {;}
 {EOL}               {linhasArq++;}
 
-{ERRO1_PALAVRA}     {printf("(%d) Erro 1 - palavra reservada mal formada: %s\n", linhasArq, yytext);}
-{ERRO3_OP}          {printf("(%d) Erro 3 - operador mal formado: %s\n", linhasArq, yytext);}
+{ERRO1_PALAVRA}     {printf("%s:%d Erro - palavra reservada mal formada: %s\n", filename, linhasArq, yytext);}
+{ERRO3_OP}          {printf("%s:%d Erro - operador mal formado: %s\n", filename, linhasArq, yytext);}
 
 {IF}                {inserirReservada(yytext, R);   return IF;}
 {ELSE}              {inserirReservada(yytext, R);   return ELSE;}
@@ -121,19 +121,18 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 
 {STRUCT}            {inserirReservada(yytext, R);   return STRUCT;}
 {ENUM}              {inserirReservada(yytext, R);   return ENUM;}
-{DEFINE}            {inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return DEFINE;}
-{INCLUDE}           {inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return INCLUDE;}
+{DEFINE}            {inserirReservada(yytext, R);   return DEFINE;}
+{INCLUDE}           {inserirReservada(yytext, R);   return INCLUDE;}
 
 {SCAN}              {inserirReservada(yytext, R);   return SCAN;}
 {PRINT}             {inserirReservada(yytext, R);   return PRINT;}
 
-
-{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  return IDENTIFICADOR;}
-{FILE_NAME}         {inserirSimbolo(yytext, 4, T);  printf("Token FILE_NAME: %s\n", yytext); return FILE_NAME;}
-{INTEIRO}           {inserirSimbolo(yytext, 1, T);  return INTEIRO;}
-{REAL}              {inserirSimbolo(yytext, 2, T);  return REAL;}
-{CARACTER}          {inserirSimbolo(yytext, 3, T);  return CARACTER;}
-{CADEIA}            {inserirSimbolo(yytext, 4, T);  return CADEIA;}
+{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  yylval.string = (char*) strdup(yytext); return IDENTIFICADOR;}
+{FILE_NAME}         {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return FILE_NAME;}
+{INTEIRO}           {inserirSimbolo(yytext, 1, T);  yylval.inteiro = atoi(yytext); return INTEIRO;}
+{REAL}              {inserirSimbolo(yytext, 2, T);  yylval.real = atof(yytext); return REAL;}
+{CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.string = (char*) strdup(yytext); return CARACTER;}
+{CADEIA}            {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return CADEIA;}
 
 {COMENTARIO}        {;}
 {SOMA}              {inserirReservada(yytext, R);   return SOMA;}
@@ -153,8 +152,7 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {OU_LOGICO}         {inserirReservada(yytext, R);   return OU_LOGICO;}
 {NOT_LOGICO}        {inserirReservada(yytext, R);   return NOT_LOGICO;}
 
-
-{ERRO2_ID}          {printf("(%d) Erro 2 - identificador mal formado: %s\n", linhasArq, yytext);}
+{ERRO2_ID}          {printf("%s:%d Erro - identificador mal formado: %s\n", filename, linhasArq, yytext);}
 
 {ABRE_P}            {inserirReservada(yytext, R);   return ABRE_P;}
 {FECHA_P}           {inserirReservada(yytext, R);   return FECHA_P;}
@@ -188,20 +186,20 @@ int yywrap(){
 //     return 0;
 // }
 
-int main() {
-    T = iniciarTabelaSimbolo();
-    R = iniciarTabelaReservada();
+// int main() {
+//     T = iniciarTabelaSimbolo();
+//     R = iniciarTabelaReservada();
 
-    printf("Digite o codigo a ser analisado (finalize com Ctrl+D em Unix/Linux ou Ctrl+Z em Windows):\n");
+//     printf("Digite o codigo a ser analisado (finalize com Ctrl+D em Unix/Linux ou Ctrl+Z em Windows):\n");
 
-    // Definindo yyin como stdin para leitura da entrada padrão
-    yyin = stdin;
+//     // Definindo yyin como stdin para leitura da entrada padrão
+//     yyin = stdin;
 
-    // Chama o analisador léxico
-    yylex();
+//     // Chama o analisador léxico
+//     yylex();
 
-    imprimirTabelaReservada(R);
-    imprimirTabelaSimbolo(T);
+//     imprimirTabelaReservada(R);
+//     imprimirTabelaSimbolo(T);
 
-    return 0;
-}
+//     return 0;
+// }
