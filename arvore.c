@@ -5,96 +5,108 @@
 
 #include "arvore.h"
 
-// Criar um novo nó com filhos
-// Entrada: nome do nó (char*) seguido de número de filhos e seus nomes
-// Saída: nó criado (NoArvore*)
-NoArvore *criarNo(const char *valor, int numFilhos, ...) {
-    NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
-    no->valor = strdup(valor);
-    no->numFilhos = numFilhos;
-    no->filhos = (NoArvore **)malloc(numFilhos * sizeof(NoArvore *));
-    
-    va_list args;
-    va_start(args, numFilhos);
-    for (int i = 0; i < numFilhos; i++) {
-        const char *filhoValor = va_arg(args, const char *);
-        no->filhos[i] = criarNo(filhoValor, 0); // Filhos sem filhos próprios inicialmente
+// Função para criar um novo nó
+No* criarNo(char* valor, int num_filhos) {
+    No* novoNo = (No*)malloc(sizeof(No));
+    strcpy(novoNo->valor, valor);  // Copia o valor do nó
+    novoNo->num_filhos = num_filhos;
+    novoNo->filhos = (No**)malloc(num_filhos * sizeof(No*));
+    for (int i = 0; i < num_filhos; i++) {
+        novoNo->filhos[i] = NULL;
     }
-    va_end(args);
+    return novoNo;
+}
+
+// Função para empilhar um nó na pilha de filhos
+void empilharFilho(PilhaFilhos** pilha, No* no) {
+    PilhaFilhos* novoElemento = (PilhaFilhos*)malloc(sizeof(PilhaFilhos));
+    novoElemento->no = no;
+    novoElemento->prox = *pilha;
+    *pilha = novoElemento;
+}
+
+// Função para desempilhar um nó da pilha de filhos
+No* desempilharFilho(PilhaFilhos** pilha) {
+    if (*pilha == NULL) {
+        return NULL;
+    }
+    PilhaFilhos* topo = *pilha;
+    No* no = topo->no;
+    *pilha = topo->prox;
+    free(topo);
     return no;
 }
 
-// Adicionar vários filhos a um nó existente
-// Entrada: nó pai, número de filhos e seus nomes
-// Saída: nenhuma
-void adicionarFilhos(NoArvore *pai, int numFilhos, ...) {
-    pai->filhos = (NoArvore **)realloc(pai->filhos, (pai->numFilhos + numFilhos) * sizeof(NoArvore *));
-    
-    va_list args;
-    va_start(args, numFilhos);
-    for (int i = 0; i < numFilhos; i++) {
-        const char *filhoValor = va_arg(args, const char *);
-        pai->filhos[pai->numFilhos + i] = criarNo(filhoValor, 0); // Filhos sem filhos próprios inicialmente
+// Função para imprimir a pilha
+void imprimirPilha(PilhaFilhos* pilha) {
+    printf("Pilha:\n");
+    while (pilha != NULL) {
+        printf("No: %s\n", pilha->no->valor);
+        pilha = pilha->prox;
     }
-    va_end(args);
-    pai->numFilhos += numFilhos;
+    printf("Fim da Pilha\n");
 }
 
-// Imprimir a árvore em níveis
-// Entrada: ponteiro para a raíz (NoArvore*) e a profundidade (int)
-// Pré-condição: a profundidade deve começar com 0
-/*
-Árvore de Derivação:
-+- Programa
-|  +- Comando
-|  |  +- TIPO_INT
-|  |  +- SIMB_ATRIBUICAO
-|  |  +- Expressao
-|  |     +- Valor
-*/
-void imprimirArvore(NoArvore *no, int nivel) {
-    if (no == NULL) return;
+// Função para associar filhos a um nó pai
+void associarFilhos(No* pai, PilhaFilhos** pilha, int num_filhos) {
+    for (int i = num_filhos - 1; i >= 0; i--) {
+        pai->filhos[i] = desempilharFilho(pilha);
+    }
+}
 
-    // Imprimir o nó atual no formato especificado
+// Função para inserir um nó na árvore
+void inserir(PilhaFilhos** pilha, char* valor, int num_filhos) {
+    No* novoNo = criarNo(valor, num_filhos);
+    empilharFilho(pilha, novoNo);
+}
+
+// // Função para imprimir a árvore
+// void imprimirArvore(No* arvore, int nivel) {
+//     for (int i = 0; i < nivel; i++) {
+//         printf("|  ");
+//     }
+//     printf("+- %s\n", arvore->valor);
+//     for (int i = 0; i < arvore->num_filhos; i++) {
+//         if (arvore->filhos[i] != NULL) {
+//             imprimirArvore(arvore->filhos[i], nivel + 1);
+//         }
+//     }
+// }
+
+// Função para imprimir a árvore
+void imprimirArvore(No* arvore, int nivel) {
+    if (arvore == NULL) {
+        return;
+    }
+
+    // Indentação de acordo com o nível atual
     for (int i = 0; i < nivel; i++) {
         printf("|  ");
     }
-    printf("+- %s\n", no->valor);
 
-    // Recursão para imprimir os filhos
-    for (int i = 0; i < no->numFilhos; i++) {
-        imprimirArvore(no->filhos[i], nivel + 1);
+    // Verifica se o nó é folha ou vazio
+    if (arvore->num_filhos == 0) {
+        printf("-- %s\n", arvore->valor); // Sem filhos
+    } else {
+        printf("+- %s\n", arvore->valor); // Com filhos
+    }
+
+    // Recursivamente imprime os filhos
+    for (int i = 0; i < arvore->num_filhos; i++) {
+        if (arvore->filhos[i] != NULL) {
+            imprimirArvore(arvore->filhos[i], nivel + 1);
+        }
     }
 }
 
-// Escrever a árvore em níveis em um arquivo
-// Entrada: ponteiro para a raíz (NoArvore*), profundidade (int) e o arquivo
-// Saída: nenhuma
-void imprimirArvoreArquivo(NoArvore *no, int nivel, FILE *arquivo) {
-    if (no == NULL || arquivo == NULL) return;
 
-    // Escrever o nó atual no arquivo com o mesmo formato da impressão
-    for (int i = 0; i < nivel; i++) {
-        fprintf(arquivo, "|  ");
+// Função para liberar a memória da árvore
+void liberarArvore(No* arvore) {
+    for (int i = 0; i < arvore->num_filhos; i++) {
+        if (arvore->filhos[i] != NULL) {
+            liberarArvore(arvore->filhos[i]);
+        }
     }
-    fprintf(arquivo, "+- %s\n", no->valor);
-
-    // Recursão para os filhos
-    for (int i = 0; i < no->numFilhos; i++) {
-        imprimirArvoreArquivo(no->filhos[i], nivel + 1, arquivo);
-    }
-}
-
-// Liberar memória da árvore
-// Entrada: nó raiz da árvore
-// Saída: nenhuma
-void liberarArvore(NoArvore *no) {
-    if (no == NULL) return;
-
-    for (int i = 0; i < no->numFilhos; i++) {
-        liberarArvore(no->filhos[i]);
-    }
-    free(no->valor);
-    free(no->filhos);
-    free(no);
+    free(arvore->filhos);
+    free(arvore);
 }

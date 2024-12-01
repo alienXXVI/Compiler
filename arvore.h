@@ -6,45 +6,25 @@
 #include <string.h>
 
 // Estrutura de um nó da árvore
-typedef struct NoArvore {
-    char *valor;               // Valor associado ao nó
-    int numFilhos;             // Número atual de filhos
-    struct NoArvore **filhos;  // Ponteiro para os filhos
-} NoArvore;
+typedef struct No {
+    char valor[50];
+    int num_filhos;
+    struct No** filhos;
+} No;
 
-// Criar um novo nó com filhos
-// Entrada: nome do nó (char*) seguido de número de filhos e seus nomes
-// Saída: nó criado (NoArvore*)
-NoArvore *criarNo(const char *valor, int numFilhos, ...);
+// Estrutura da pilha de filhos
+typedef struct PilhaFilhos {
+    No* no;
+    struct PilhaFilhos* prox;
+} PilhaFilhos;
 
-// Adicionar vários filhos a um nó existente
-// Entrada: nó pai, número de filhos e seus nomes
-// Saída: nenhuma
-void adicionarFilhos(NoArvore *pai, int numFilhos, ...);
-
-// Imprimir a árvore em níveis
-// Entrada: ponteiro para a raíz (NoArvore*) e a profundidade (int)
-// Pré-condição: a profundidade deve começar com 0
-/*
-Árvore de Derivação:
-+- Programa
-|  +- Comando
-|  |  +- TIPO_INT
-|  |  +- SIMB_ATRIBUICAO
-|  |  +- Expressao
-|  |     +- Valor
-*/
-void imprimirArvore(NoArvore *no, int nivel);
-
-// Escrever a árvore em níveis em um arquivo
-// Entrada: ponteiro para a raíz (NoArvore*), profundidade (int) e o arquivo
-// Saída: nenhuma
-void imprimirArvoreArquivo(NoArvore *no, int nivel, FILE *arquivo);
-
-// Liberar memória da árvore
-// Entrada: nó raiz da árvore
-// Saída: nenhuma
-void liberarArvore(NoArvore *no);
-
+No* criarNo(char* valor, int num_filhos);
+void empilharFilho(PilhaFilhos** pilha, No* no);
+No* desempilharFilho(PilhaFilhos** pilha);
+void imprimirPilha(PilhaFilhos* pilha);
+void associarFilhos(No* pai, PilhaFilhos** pilha, int num_filhos);
+void inserir(PilhaFilhos** pilha, char* valor, int num_filhos);
+void imprimirArvore(No* arvore, int nivel);
+void liberarArvore(No* arvore);
 
 #endif

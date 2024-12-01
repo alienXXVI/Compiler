@@ -2,16 +2,13 @@
     #include <stdio.h>
     #include <string.h>
     #include "hash_table.h"
-    // #include "analise_sintatica.tab.h"
+    #include "analise_sintatica.tab.h"
 
     TabelaSimbolo *T;
     TabelaReservada *R;
 
-    // extern 
     int linhasArq = 1;
 %}
-
-%option noyywrap
 
 LETRA               [a-zA-Z]
 DIGITO              [0-9]
@@ -73,8 +70,6 @@ ABRE_P              "("
 FECHA_P             ")"
 ABRE_CH             "{"
 FECHA_CH            "}"
-ABRE_COL            "["
-FECHA_COL           "]"
 VIRGULA             ","
 ASPAS_DUPLAS        \"
 PONTO_VIRGULA       ";"
@@ -89,8 +84,8 @@ ERRO1_4_3           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~
 ERRO1_4             {ERRO1_4_1}|{ERRO1_4_2}|{ERRO1_4_3}
 ERRO1_PALAVRA       {ERRO1_1}|{ERRO1_2}|{ERRO1_3}|{ERRO1_4}
 
-ERRO2_1             [!#@$%&*,.;<>:^~0-9]+{IDENTIFICADOR}
-ERRO2_2             {IDENTIFICADOR}[!#@$%&*,.;<>:^~]+
+ERRO2_1             [!#@$%&*.;<>:^~0-9]+{IDENTIFICADOR}
+ERRO2_2             {IDENTIFICADOR}[!#@$%&*.;<>:^~]+
 ERRO2_3             [!#@$%&*,.;<>:^~0-9]+{IDENTIFICADOR}[!#@$%&*,.;<>:^~]+
 ERRO2_ID            {ERRO2_1}|{ERRO2_2}|{ERRO2_3}
 
@@ -107,103 +102,106 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {ERRO1_PALAVRA}     {printf("(%d) Erro 1 - palavra reservada mal formada: %s\n", linhasArq, yytext);}
 {ERRO3_OP}          {printf("(%d) Erro 3 - operador mal formado: %s\n", linhasArq, yytext);}
 
-{IF}                {inserirReservada(yytext, R);}
-{ELSE}              {inserirReservada(yytext, R);}
-{WHILE}             {inserirReservada(yytext, R);}
-{FOR}               {inserirReservada(yytext, R);}
-{DO}                {inserirReservada(yytext, R);}
-{SWITCH}            {inserirReservada(yytext, R);}
-{CASE}              {inserirReservada(yytext, R);}
-{BREAK}             {inserirReservada(yytext, R);}
-{RETURN}            {inserirReservada(yytext, R);}
-{DEFAULT}           {inserirReservada(yytext, R);}
+{IF}                {inserirReservada(yytext, R);   return IF;}
+{ELSE}              {inserirReservada(yytext, R);   return ELSE;}
+{WHILE}             {inserirReservada(yytext, R);   return WHILE;}
+{FOR}               {inserirReservada(yytext, R);   return FOR;}
+{DO}                {inserirReservada(yytext, R);   return DO;}
+{SWITCH}            {inserirReservada(yytext, R);   return SWITCH;}
+{CASE}              {inserirReservada(yytext, R);   return CASE;}
+{BREAK}             {inserirReservada(yytext, R);   return BREAK;}
+{RETURN}            {inserirReservada(yytext, R);   return RETURN;}
+{DEFAULT}           {inserirReservada(yytext, R);   return DEFAULT;}
 
-{INT}               {inserirReservada(yytext, R);}
-{FLOAT}             {inserirReservada(yytext, R);}
-{CHAR}              {inserirReservada(yytext, R);}
-{VOID}              {inserirReservada(yytext, R);}
-{STRING}            {inserirReservada(yytext, R);}
+{INT}               {inserirReservada(yytext, R);   return INT;}
+{FLOAT}             {inserirReservada(yytext, R);   return FLOAT;}
+{CHAR}              {inserirReservada(yytext, R);   return CHAR;}
+{VOID}              {inserirReservada(yytext, R);   return VOID;}
+{STRING}            {inserirReservada(yytext, R);   return STRING;}
 
-{STRUCT}            {inserirReservada(yytext, R);}
-{ENUM}              {inserirReservada(yytext, R);}
-{DEFINE}            {inserirReservada(yytext, R);}
-{INCLUDE}           {inserirReservada(yytext, R);}
+{STRUCT}            {inserirReservada(yytext, R);   return STRUCT;}
+{ENUM}              {inserirReservada(yytext, R);   return ENUM;}
+{DEFINE}            {inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return DEFINE;}
+{INCLUDE}           {inserirReservada(yytext, R);   printf("Token: %s\n", yytext); return INCLUDE;}
 
-{SCAN}              {inserirReservada(yytext, R);}
-{PRINT}             {inserirReservada(yytext, R);}
+{SCAN}              {inserirReservada(yytext, R);   return SCAN;}
+{PRINT}             {inserirReservada(yytext, R);   return PRINT;}
 
-{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);}
-{INTEIRO}           {inserirSimbolo(yytext, 1, T);}
-{REAL}              {inserirSimbolo(yytext, 2, T);}
-{CARACTER}          {inserirSimbolo(yytext, 3, T);}
-{CADEIA}            {inserirSimbolo(yytext, 4, T);}
-{FILE_NAME}         {inserirSimbolo(yytext, 4, T);}
+
+{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  return IDENTIFICADOR;}
+{FILE_NAME}         {inserirSimbolo(yytext, 4, T);  printf("Token FILE_NAME: %s\n", yytext); return FILE_NAME;}
+{INTEIRO}           {inserirSimbolo(yytext, 1, T);  return INTEIRO;}
+{REAL}              {inserirSimbolo(yytext, 2, T);  return REAL;}
+{CARACTER}          {inserirSimbolo(yytext, 3, T);  return CARACTER;}
+{CADEIA}            {inserirSimbolo(yytext, 4, T);  return CADEIA;}
 
 {COMENTARIO}        {;}
-{SOMA}              {inserirReservada(yytext, R);}
-{MULTIPLICACAO}     {inserirReservada(yytext, R);}
-{DIVISAO}           {inserirReservada(yytext, R);}
-{SUBTRACAO}         {inserirReservada(yytext, R);}
-{RECEBE}            {inserirReservada(yytext, R);}
+{SOMA}              {inserirReservada(yytext, R);   return SOMA;}
+{MULTIPLICACAO}     {inserirReservada(yytext, R);   return MULTIPLICACAO;}
+{DIVISAO}           {inserirReservada(yytext, R);   return DIVISAO;}
+{SUBTRACAO}         {inserirReservada(yytext, R);   return SUBTRACAO;}
+{RECEBE}            {inserirReservada(yytext, R);   return RECEBE;}
 
-{IGUAL}             {inserirReservada(yytext, R);}
-{DIFERENTE}         {inserirReservada(yytext, R);}
-{MAIOR}             {inserirReservada(yytext, R);}
-{MENOR}             {inserirReservada(yytext, R);}
-{MAIOR_IGUAL}       {inserirReservada(yytext, R);}
-{MENOR_IGUAL}       {inserirReservada(yytext, R);}
+{IGUAL}             {inserirReservada(yytext, R);   return IGUAL;}
+{DIFERENTE}         {inserirReservada(yytext, R);   return DIFERENTE;}
+{MAIOR}             {inserirReservada(yytext, R);   return MAIOR;}
+{MENOR}             {inserirReservada(yytext, R);   return MENOR;}
+{MAIOR_IGUAL}       {inserirReservada(yytext, R);   return MAIOR_IGUAL;}
+{MENOR_IGUAL}       {inserirReservada(yytext, R);   return MENOR_IGUAL;}
 
-{E_LOGICO}          {inserirReservada(yytext, R);}
-{OU_LOGICO}         {inserirReservada(yytext, R);}
-{NOT_LOGICO}        {inserirReservada(yytext, R);}
+{E_LOGICO}          {inserirReservada(yytext, R);   return E_LOGICO;}
+{OU_LOGICO}         {inserirReservada(yytext, R);   return OU_LOGICO;}
+{NOT_LOGICO}        {inserirReservada(yytext, R);   return NOT_LOGICO;}
+
 
 {ERRO2_ID}          {printf("(%d) Erro 2 - identificador mal formado: %s\n", linhasArq, yytext);}
 
-{ABRE_P}            {inserirReservada(yytext, R);}
-{FECHA_P}           {inserirReservada(yytext, R);}
-{ABRE_CH}           {inserirReservada(yytext, R);}
-{FECHA_CH}          {inserirReservada(yytext, R);}
-{ABRE_COL}          {inserirReservada(yytext, R);}
-{FECHA_COL}         {inserirReservada(yytext, R);}
-{VIRGULA}           {inserirReservada(yytext, R);}
-{ASPAS_DUPLAS}      {inserirReservada(yytext, R);}
-{PONTO_VIRGULA}     {inserirReservada(yytext, R);}
-{DOIS_PONTOS}       {inserirReservada(yytext, R);}
+{ABRE_P}            {inserirReservada(yytext, R);   return ABRE_P;}
+{FECHA_P}           {inserirReservada(yytext, R);   return FECHA_P;}
+{ABRE_CH}           {inserirReservada(yytext, R);   return ABRE_CH;}
+{FECHA_CH}          {inserirReservada(yytext, R);   return FECHA_CH;}
+{VIRGULA}           {inserirReservada(yytext, R);   return VIRGULA;}
+{PONTO_VIRGULA}     {inserirReservada(yytext, R);   return PONTO_VIRGULA;}
+{DOIS_PONTOS}       {inserirReservada(yytext, R);   return DOIS_PONTOS;}
 
 %%
 
-int main(int argc, char *argv[]) {
-    T = iniciarTabelaSimbolo();
-    R = iniciarTabelaReservada();
-
-    yyin = fopen(argv[1], "r");
-    if(yyin == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
-        exit(1);
-    } 
-
-    yylex();
-    printf("\n");
-    imprimirTabelaReservada(R);
-    imprimirTabelaSimbolo(T);
-
-    return 0;
+int yywrap(){
+    return 1;
 }
 
-// int main() {
+// int main(int argc, char *argv[]) {
 //     T = iniciarTabelaSimbolo();
 //     R = iniciarTabelaReservada();
 
-//     printf("Digite o codigo a ser analisado (finalize com Ctrl+D em Unix/Linux ou Ctrl+Z em Windows):\n");
+//     yyin = fopen(argv[1], "r");
+//     if(yyin == NULL) {
+//         printf("Erro ao abrir o arquivo.\n");
+//         exit(1);
+//     } 
 
-//     // Definindo yyin como stdin para leitura da entrada padrão
-//     yyin = stdin;
-
-//     // Chama o analisador léxico
 //     yylex();
-
+//     printf("\n");
 //     imprimirTabelaReservada(R);
 //     imprimirTabelaSimbolo(T);
 
 //     return 0;
 // }
+
+int main() {
+    T = iniciarTabelaSimbolo();
+    R = iniciarTabelaReservada();
+
+    printf("Digite o codigo a ser analisado (finalize com Ctrl+D em Unix/Linux ou Ctrl+Z em Windows):\n");
+
+    // Definindo yyin como stdin para leitura da entrada padrão
+    yyin = stdin;
+
+    // Chama o analisador léxico
+    yylex();
+
+    imprimirTabelaReservada(R);
+    imprimirTabelaSimbolo(T);
+
+    return 0;
+}

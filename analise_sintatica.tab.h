@@ -91,12 +91,9 @@ extern int yydebug;
      FECHA_P = 300,
      ABRE_CH = 301,
      FECHA_CH = 302,
-     ABRE_COL = 303,
-     FECHA_COL = 304,
-     VIRGULA = 305,
-     ASPAS_DUPLAS = 306,
-     DOIS_PONTOS = 307,
-     PONTO_VIRGULA = 308
+     VIRGULA = 303,
+     DOIS_PONTOS = 304,
+     PONTO_VIRGULA = 305
    };
 #endif
 
@@ -105,16 +102,15 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 19 "analise_sintatica.y"
+#line 22 "analise_sintatica.y"
 
     int inteiro;
     double real;
     char* string;
-    char caractere;
 
 
 /* Line 2058 of yacc.c  */
-#line 118 "analise_sintatica.tab.h"
+#line 114 "analise_sintatica.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -70,10 +70,7 @@ ABRE_P              "("
 FECHA_P             ")"
 ABRE_CH             "{"
 FECHA_CH            "}"
-ABRE_COL            "["
-FECHA_COL           "]"
 VIRGULA             ","
-ASPAS_DUPLAS        \"
 PONTO_VIRGULA       ";"
 DOIS_PONTOS         ":"
 
@@ -86,9 +83,9 @@ ERRO1_4_3           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~
 ERRO1_4             {ERRO1_4_1}|{ERRO1_4_2}|{ERRO1_4_3}
 ERRO1_PALAVRA       {ERRO1_1}|{ERRO1_2}|{ERRO1_3}|{ERRO1_4}
 
-ERRO2_1             [!#@$%&*,.;<>:^~0-9]+{IDENTIFICADOR}
-ERRO2_2             {IDENTIFICADOR}[!#@$%&*,.;<>:^~]+
-ERRO2_3             [!#@$%&*,.;<>:^~0-9]+{IDENTIFICADOR}[!#@$%&*,.;<>:^~]+
+ERRO2_1             [#@$%&*.;>:^~0-9]+{IDENTIFICADOR}
+ERRO2_2             {IDENTIFICADOR}[!#@$%&*.;<:^~]+
+ERRO2_3             [#@$%&*.;>:^~0-9]+{IDENTIFICADOR}[!#@$%&*.;<:^~]+
 ERRO2_ID            {ERRO2_1}|{ERRO2_2}|{ERRO2_3}
 
 ERRO3_SOMA          ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{SOMA}({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})*
@@ -130,11 +127,11 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {PRINT}             {inserirReservada(yytext, R);   return PRINT;}
 
 {IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  yylval.string = (char*) strdup(yytext); return IDENTIFICADOR;}
+{FILE_NAME}         {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return FILE_NAME;}
 {INTEIRO}           {inserirSimbolo(yytext, 1, T);  yylval.inteiro = atoi(yytext); return INTEIRO;}
 {REAL}              {inserirSimbolo(yytext, 2, T);  yylval.real = atof(yytext); return REAL;}
-{CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.caractere = (char) yytext[0]; return CARACTER;}
+{CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.string = (char*) strdup(yytext); return CARACTER;}
 {CADEIA}            {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return CADEIA;}
-{FILE_NAME}         {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return FILE_NAME;}
 
 {COMENTARIO}        {;}
 {SOMA}              {inserirReservada(yytext, R);   return SOMA;}
@@ -160,10 +157,7 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {FECHA_P}           {inserirReservada(yytext, R);   return FECHA_P;}
 {ABRE_CH}           {inserirReservada(yytext, R);   return ABRE_CH;}
 {FECHA_CH}          {inserirReservada(yytext, R);   return FECHA_CH;}
-{ABRE_COL}          {inserirReservada(yytext, R);   return ABRE_COL;}
-{FECHA_COL}         {inserirReservada(yytext, R);   return FECHA_COL;}
 {VIRGULA}           {inserirReservada(yytext, R);   return VIRGULA;}
-{ASPAS_DUPLAS}      {inserirReservada(yytext, R);   return ASPAS_DUPLAS;}
 {PONTO_VIRGULA}     {inserirReservada(yytext, R);   return PONTO_VIRGULA;}
 {DOIS_PONTOS}       {inserirReservada(yytext, R);   return DOIS_PONTOS;}
 
