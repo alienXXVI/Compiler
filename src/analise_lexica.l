@@ -1,13 +1,14 @@
 %{
     #include <stdio.h>
     #include <string.h>
-    #include ".\estruturas\hash_table.h"
+    #include "..\estruturas\hash_table.h"
     #include "analise_sintatica.tab.h"
 
     TabelaSimbolo *T;
     TabelaReservada *R;
 
     extern int linhasArq;
+    extern int errolex;
     extern char *filename;
 %}
 
@@ -75,32 +76,35 @@ VIRGULA             ","
 PONTO_VIRGULA       ";"
 DOIS_PONTOS         ":"
 
-ERRO1_1             [!#@$%&*,.;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE})
-ERRO1_2             ({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE})[!#@$%&*,.;<>:^~=|]+
-ERRO1_3             [!#@$%&*,.;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE})[!#@$%&*,.;<>:^~0-9=|]+
+OP_ARITMETICO       ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})
+OP_RELACIONAL       ({IGUAL}|{DIFERENTE}|{MAIOR}|{MENOR}|{MAIOR_IGUAL}|{MENOR_IGUAL})
+OP_LOGICO           ({E_LOGICO}|{OU_LOGICO}|{E_LOGICO})
+
+ERRO1_1             [!#@$%&*,.;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRING}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT})
+ERRO1_2             ({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT}|{STRING})[!#@$%&*,;<>^~=|]+
+ERRO1_3             [!#@$%&*,;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT}|{STRING})[!#@$%&*,;<>^~0-9=|]+
 ERRO1_4_1           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE}))
 ERRO1_4_2           (({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~0-9=|]+)
 ERRO1_4_3           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~0-9=|]+)
 ERRO1_4             {ERRO1_4_1}|{ERRO1_4_2}|{ERRO1_4_3}
 ERRO1_PALAVRA       {ERRO1_1}|{ERRO1_2}|{ERRO1_3}|{ERRO1_4}
 
-ERRO2_1             [#@$%&*.>:^~0-9]+{IDENTIFICADOR}
-ERRO2_2             {IDENTIFICADOR}[!#@$%&*.<:^~]+
-ERRO2_3             [#@$%&*.>:^~0-9]+{IDENTIFICADOR}[!#@$%&*.<:^~]+
+ERRO2_1             [#@$%&*>:^~0-9]+{IDENTIFICADOR}
+ERRO2_2             {IDENTIFICADOR}[!#@$%&*.<^~]+
+ERRO2_3             [#@$%&*>:^~0-9]+{IDENTIFICADOR}[!#@$%&*<.^~]+
 ERRO2_ID            {ERRO2_1}|{ERRO2_2}|{ERRO2_3}
 
-ERRO3_SOMA          ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{SOMA}({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})*
-ERRO3_MULTIPLICAO   ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{MULTIPLICACAO}({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})*
-ERRO3_DIVISAO       ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{DIVISAO}({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})*
-ERRO3_SUBTRACAO     ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})+{SUBTRACAO}({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})*
-ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTIPLICAO})
+ERRO3_ARITMETICO    {OP_ARITMETICO}+{OP_ARITMETICO}{OP_ARITMETICO}*
+ERRO3_RELACIONAL    {OP_RELACIONAL}+{OP_RELACIONAL}{OP_RELACIONAL}*
+ERRO3_LOGICO        {OP_LOGICO}+{OP_LOGICO}{OP_LOGICO}*
+ERRO3_OP            ({ERRO3_ARITMETICO}|{ERRO3_RELACIONAL}|{ERRO3_LOGICO})
 
 %%
 {BRANCO}            {;}
 {EOL}               {linhasArq++;}
 
-{ERRO1_PALAVRA}     {printf("%s:%d Erro - palavra reservada mal formada: %s\n", filename, linhasArq, yytext);}
-{ERRO3_OP}          {printf("%s:%d Erro - operador mal formado: %s\n", filename, linhasArq, yytext);}
+{ERRO1_PALAVRA}     {errolex = 1; printf("%s:%d Erro - palavra reservada mal formada: %s\n", filename, linhasArq, yytext);}
+{ERRO3_OP}          {errolex = 1; printf("%s:%d Erro - operador mal formado: %s\n", filename, linhasArq, yytext);}
 
 {IF}                {inserirReservada(yytext, R);   return IF;}
 {ELSE}              {inserirReservada(yytext, R);   return ELSE;}
@@ -127,8 +131,8 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {SCAN}              {inserirReservada(yytext, R);   return SCAN;}
 {PRINT}             {inserirReservada(yytext, R);   return PRINT;}
 
-{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  yylval.string = (char*) strdup(yytext); return IDENTIFICADOR;}
 {FILE_NAME}         {inserirSimbolo(yytext, 4, T);  yylval.string = (char*) strdup(yytext); return FILE_NAME;}
+{IDENTIFICADOR}     {inserirSimbolo(yytext, 0, T);  yylval.string = (char*) strdup(yytext); return IDENTIFICADOR;}
 {INTEIRO}           {inserirSimbolo(yytext, 1, T);  yylval.inteiro = atoi(yytext); return INTEIRO;}
 {REAL}              {inserirSimbolo(yytext, 2, T);  yylval.real = atof(yytext); return REAL;}
 {CARACTER}          {inserirSimbolo(yytext, 3, T);  yylval.string = (char*) strdup(yytext); return CARACTER;}
@@ -152,8 +156,6 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {OU_LOGICO}         {inserirReservada(yytext, R);   return OU_LOGICO;}
 {NOT_LOGICO}        {inserirReservada(yytext, R);   return NOT_LOGICO;}
 
-{ERRO2_ID}          {printf("%s:%d Erro - identificador mal formado: %s\n", filename, linhasArq, yytext);}
-
 {ABRE_P}            {inserirReservada(yytext, R);   return ABRE_P;}
 {FECHA_P}           {inserirReservada(yytext, R);   return FECHA_P;}
 {ABRE_CH}           {inserirReservada(yytext, R);   return ABRE_CH;}
@@ -161,6 +163,9 @@ ERRO3_OP            ({ERRO3_SOMA}|{ERRO3_DIVISAO}|{ERRO3_SUBTRACAO}|{ERRO3_MULTI
 {VIRGULA}           {inserirReservada(yytext, R);   return VIRGULA;}
 {PONTO_VIRGULA}     {inserirReservada(yytext, R);   return PONTO_VIRGULA;}
 {DOIS_PONTOS}       {inserirReservada(yytext, R);   return DOIS_PONTOS;}
+
+{ERRO2_ID}          {errolex = 1; printf("%s:%d Erro - identificador mal formado: %s\n", filename, linhasArq, yytext);}
+
 
 %%
 

@@ -50,7 +50,6 @@ IDENTIFICADOR       (_|{LETRA})(_|{LETRA}|{DIGITO})*
 - **Erro 1** - reconhecimento de palavras reservadas mal formadas (`if3`, `*while`)
 - **Erro 2** - identificadores mal formados, não seguem o padrão solicitado (`90_aliana`)
 - **Erro 3** - operadores mal formados, duplicados ou "compostos" (`++`, `+/`)
-- **Erro 4** - reconhecimento de caracteres inválidos pela linguagem (`$` ou `~`)
 
 ## 2. Inserção de Tokens
 

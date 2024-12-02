@@ -1,7 +1,7 @@
 %{
     #include <stdio.h>
-    #include ".\estruturas\arvore.h"
-    #include ".\estruturas\hash_table.h"
+    #include "..\estruturas\arvore.h"
+    #include "..\estruturas\hash_table.h"
     
     extern int yylex();
     extern int yyparse();
@@ -16,6 +16,7 @@
     No* arvore = NULL;
     int linhasArq = 1;
     char *filename = NULL;
+    int errolex = 0;
 
     char str[200];
     
@@ -40,7 +41,6 @@
 %token  IGUAL DIFERENTE MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL
 %token  E_LOGICO OU_LOGICO NOT_LOGICO
 %token  ABRE_P FECHA_P ABRE_CH FECHA_CH VIRGULA DOIS_PONTOS PONTO_VIRGULA
-
 
 %left OU_LOGICO
 %left E_LOGICO
@@ -314,6 +314,12 @@ atribuicao:
         associarFilhos(no, &pilha, 3);
         empilharFilho(&pilha, no);
     }
+    | identificador recebe chamada_funcao {
+        inserir(&pilha, "atribuicao", 3);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 3);
+        empilharFilho(&pilha, no);
+    }
     ;
 expressao: 
       operacao {
@@ -417,9 +423,9 @@ sentenca_while:
     ;
 sentenca_for: 
     for abre_p parametros_for fecha_p corpo {
-        inserir(&pilha, "sentenca_for", 4);
+        inserir(&pilha, "sentenca_for", 5);
         No* no = desempilharFilho(&pilha);
-        associarFilhos(no, &pilha, 4);
+        associarFilhos(no, &pilha, 5);
         empilharFilho(&pilha, no);
     }
     ;
@@ -554,12 +560,6 @@ cases:
         associarFilhos(no, &pilha, 2);
         empilharFilho(&pilha, no);
       }
-    | default {
-        inserir(&pilha, "cases", 1);
-        No* no = desempilharFilho(&pilha);
-        associarFilhos(no, &pilha, 1);
-        empilharFilho(&pilha, no);
-    }
     | /*vazio*/ {
         inserir(&pilha, "cases", 0);
     }
@@ -569,6 +569,12 @@ sentenca_case:
         inserir(&pilha, "sentenca_case", 4);
         No* no = desempilharFilho(&pilha);
         associarFilhos(no, &pilha, 4);
+        empilharFilho(&pilha, no);
+    }
+    | default dois_pontos comandos {
+        inserir(&pilha, "sentenca_case", 3);
+        No* no = desempilharFilho(&pilha);
+        associarFilhos(no, &pilha, 3);
         empilharFilho(&pilha, no);
     }
     ;
@@ -735,8 +741,9 @@ int main(int argc, char **argv) {
     imprimirTabelaSimbolo(T);
     imprimirTabelaReservada(R); 
 
-    if (yynerrs == 0) {
-        salvarArvoreEmArquivo(arvore, filename);
+    if (!yynerrs && !errolex) {
+        // salvarArvoreEmArquivo(arvore, filename);
+        salvarArvoreEmArquivo(arvore, "../arvores_geradas", filename);
     } else {
         yyerror("Erro sintatico.");
     }

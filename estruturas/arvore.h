@@ -25,7 +25,7 @@ void imprimirPilha(PilhaFilhos* pilha);
 void associarFilhos(No* pai, PilhaFilhos** pilha, int num_filhos);
 void inserir(PilhaFilhos** pilha, char* valor, int num_filhos);
 void imprimirArvore(No* arvore, int nivel);
-void salvarArvoreEmArquivo(No* arvore, char* nomeArquivoOriginal);
+void salvarArvoreEmArquivo(No* arvore, const char* caminhoDiretorio, const char* nomeArquivoOriginal);
 void liberarArvore(No* arvore);
 
 #endif

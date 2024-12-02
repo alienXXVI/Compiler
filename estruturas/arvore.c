@@ -129,16 +129,20 @@ void imprimirArvoreArquivo(No* arvore, int nivel, FILE* arquivo) {
 //     printf("Arvore salva no arquivo: %s\n", nomeArquivo);
 // }
 
-void salvarArvoreEmArquivo(No* arvore, char* nomeArquivoOriginal) {
+void salvarArvoreEmArquivo(No* arvore, const char* caminhoDiretorio, const char* nomeArquivoOriginal) {
     // Extrai o nome do arquivo sem o caminho
     char nomeArquivo[256];
-    char* nomeBase = basename(nomeArquivoOriginal); // Extrai o nome do arquivo do caminho
+    char* nomeBase = basename((char*)nomeArquivoOriginal); // Extrai o nome do arquivo do caminho
     snprintf(nomeArquivo, sizeof(nomeArquivo), "arvore_%s", nomeBase);
-    
+
+    // Cria o caminho completo para salvar o arquivo
+    char caminhoCompleto[512];
+    snprintf(caminhoCompleto, sizeof(caminhoCompleto), "%s/%s", caminhoDiretorio, nomeArquivo);
+
     // Abre o arquivo para escrita
-    FILE* arquivo = fopen(nomeArquivo, "w");
+    FILE* arquivo = fopen(caminhoCompleto, "w");
     if (arquivo == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo %s para escrita.\n", nomeArquivo);
+        fprintf(stderr, "Erro ao abrir o arquivo %s para escrita.\n", caminhoCompleto);
         return;
     }
 
@@ -147,7 +151,7 @@ void salvarArvoreEmArquivo(No* arvore, char* nomeArquivoOriginal) {
     imprimirArvoreArquivo(arvore, 0, arquivo);
 
     fclose(arquivo);
-    printf("Arvore salva no arquivo: %s\n", nomeArquivo);
+    printf("Arvore salva no arquivo: %s\n", caminhoCompleto);
 }
 
 // Função para liberar a memória da árvore

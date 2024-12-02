@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <str.h>
+#include "lista.h"
+
+#define MAX 100
+#define PI 3.14
+
+// função de divisão: a/b
+float divisao(float a, float b) {
+    string mensagem = "Digite um numero menor que " + MAX
+    
+    if (b != 0) {
+        if(a <= MAX) {
+            return (a / b)
+        }
+        else {
+            return mensagem
+        }
+    }
+    else {
+        return -1
+    }
+}
+
+int main() {
+    float x = y = z = 0.0
+
+    do {
+        print("Digite dois numeros:")
+        scan(x, y)
+
+        z = divisao(x, y)
+        switch (z) {
+            case -1: break
+            case 0: print("Resultado:"; z)
+            default: break
+        }
+    } while ((x <= MAX) || (y == -1))
+    
+    for(int i = 0; i < MAX; i = i + 1) {
+        // Contagem até 100
+        print("Numero :"; i)
+
+        if(i == 50) {
+            print("Metade")
+        }
+    }
+}
