@@ -76,13 +76,13 @@ No `main`, as tabelas são inicializadas e após a varredura do arquivo, são pr
 
 <br>
 
-# Estruturas de Dados e Métodos
+## Estruturas de Dados e Métodos
 
 Em `hash_table.c` e `.h` estão as estruturas de dados e métodos para tratar as tabelas hashing.
 
 <br>
 
-## 1. Estrutura de Símbolo
+### 1. Estrutura de Símbolo
 
 Um símbolo é armazenado em um "nó", que contém seu identificador, seu valor em string e sua categoria.
 
@@ -111,7 +111,7 @@ Um símbolo pode ter as seguintes categorias:
 
 <br>
 
-## 2. Estrutura de Palavra Reservada
+### 2. Estrutura de Palavra Reservada
 
 Uma palavra reservada é armazenada em um "nó", que contém seu identificador e seu valor em string.
 
@@ -937,7 +937,7 @@ arquivo.extensao
    
 <br>
 
-# Alguns Erros Sintáticos Comuns
+## Alguns Erros Sintáticos Comuns
 
 Além de reconhecer os erros léxicos, na fase do parser, quando é encontrado um erro sintático, este é exibido na tela. Por exemplo:
 
@@ -964,7 +964,7 @@ funcao a, b
 ```
 <br>
 
-# Árvore de Derivação
+## Árvore de Derivação
 
 É gerado um arquivo de nome “arvore_nomeArquivo.txt” na pasta “arvores_geradas” com a árvore de derivação por onde o parser passou depois que uma “cadeia” (ou código fonte) é aceita.
 
@@ -984,7 +984,7 @@ No main, as tabelas de símbolos e de palavras reservadas continuam sendo impres
 
 <br>
 
-# Compilação
+## Compilação
 
 Para compilar, é recomendado estar na pasta de caminho:
 
