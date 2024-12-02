@@ -6,10 +6,12 @@
 
 #include "arvore.h"
 
-// Função para criar um novo nó
+// Cria um novo nó
+// Entrada: valor do nó e número de filhos
+// Saída: nó criado
 No* criarNo(char* valor, int num_filhos) {
     No* novoNo = (No*)malloc(sizeof(No));
-    strcpy(novoNo->valor, valor);  // Copia o valor do nó
+    strcpy(novoNo->valor, valor);
     novoNo->num_filhos = num_filhos;
     novoNo->filhos = (No**)malloc(num_filhos * sizeof(No*));
     for (int i = 0; i < num_filhos; i++) {
@@ -18,7 +20,9 @@ No* criarNo(char* valor, int num_filhos) {
     return novoNo;
 }
 
-// Função para empilhar um nó na pilha de filhos
+// Empilha um nó na pilha de filhos
+// Entrada: pilha em questão e nó a ser empilhado
+// Saída: nenhuma
 void empilharFilho(PilhaFilhos** pilha, No* no) {
     PilhaFilhos* novoElemento = (PilhaFilhos*)malloc(sizeof(PilhaFilhos));
     novoElemento->no = no;
@@ -26,7 +30,9 @@ void empilharFilho(PilhaFilhos** pilha, No* no) {
     *pilha = novoElemento;
 }
 
-// Função para desempilhar um nó da pilha de filhos
+// Desempilha um nó da pilha de filhos
+// Entrada: pilha em questão
+// Saída: nó desempilhado
 No* desempilharFilho(PilhaFilhos** pilha) {
     if (*pilha == NULL) {
         return NULL;
@@ -38,7 +44,9 @@ No* desempilharFilho(PilhaFilhos** pilha) {
     return no;
 }
 
-// Função para imprimir a pilha
+// Imprimir a pilha
+// Entrada: pilha a ser impressa
+// Saída: nenhuma
 void imprimirPilha(PilhaFilhos* pilha) {
     printf("Pilha:\n");
     while (pilha != NULL) {
@@ -48,20 +56,26 @@ void imprimirPilha(PilhaFilhos* pilha) {
     printf("Fim da Pilha\n");
 }
 
-// Função para associar filhos a um nó pai
+// Associa filhos a um nó pai
+// Entrada: ponteiro ao nó pai, pilha de nós e número de filhos
+// Saída: nenhuma
 void associarFilhos(No* pai, PilhaFilhos** pilha, int num_filhos) {
     for (int i = num_filhos - 1; i >= 0; i--) {
         pai->filhos[i] = desempilharFilho(pilha);
     }
 }
 
-// Função para inserir um nó na árvore
+// Insere um nó na árvore
+// Entrada: pilha de nós, valor do nó e seu número de filhos
+// Saída: nenhuma
 void inserir(PilhaFilhos** pilha, char* valor, int num_filhos) {
     No* novoNo = criarNo(valor, num_filhos);
     empilharFilho(pilha, novoNo);
 }
 
-// Função para imprimir a árvore
+// Imprime a árvore na tela
+// Entrada: ponteiro para a árvore e seu nível (começa com 0)
+// Saída: nenhuma
 void imprimirArvore(No* arvore, int nivel) {
     if (arvore == NULL) {
         return;
@@ -87,6 +101,9 @@ void imprimirArvore(No* arvore, int nivel) {
     }
 }
 
+// Imprime a árvore no arquivo dado
+// Entrada: ponteiro para a árvore, seu nível (começa com 0) e ponteiro para o arquivo
+// Saída: nenhuma
 void imprimirArvoreArquivo(No* arvore, int nivel, FILE* arquivo) {
     if (arvore == NULL) {
         return;
@@ -112,23 +129,10 @@ void imprimirArvoreArquivo(No* arvore, int nivel, FILE* arquivo) {
     }
 }
 
-// // Função para salvar a árvore em um arquivo
-// void salvarArvoreEmArquivo(No* arvore, const char* nomeArquivoOriginal) {
-//     char nomeArquivo[256];
-//     snprintf(nomeArquivo, sizeof(nomeArquivo), "arvore_%s", nomeArquivoOriginal);
-    
-//     FILE* arquivo = fopen(nomeArquivo, "w");
-//     if (arquivo == NULL) {
-//         fprintf(stderr, "Erro ao abrir o arquivo %s para escrita.\n", nomeArquivo);
-//         return;
-//     }
-//     fprintf(arquivo, "Arvore de Derivacao:\n");
-//     imprimirArvoreArquivo(arvore, 0, arquivo);
-
-//     fclose(arquivo);
-//     printf("Arvore salva no arquivo: %s\n", nomeArquivo);
-// }
-
+// Salva arvore em arquivi dado
+// Entrada: ponteiro para a árvore, caminho para o diretório do arquivo e o nome do arquivo
+// Saída: nenhuma
+// Pós-condição: o arquivo será salvo no caminho dado, com o nome "arvore_NOME.txt"
 void salvarArvoreEmArquivo(No* arvore, const char* caminhoDiretorio, const char* nomeArquivoOriginal) {
     // Extrai o nome do arquivo sem o caminho
     char nomeArquivo[256];
@@ -154,7 +158,9 @@ void salvarArvoreEmArquivo(No* arvore, const char* caminhoDiretorio, const char*
     printf("Arvore salva no arquivo: %s\n", caminhoCompleto);
 }
 
-// Função para liberar a memória da árvore
+// Libera a memória da árvore
+// Entrada: ponteiro para a árvore
+// Saída: nenhuma
 void liberarArvore(No* arvore) {
     for (int i = 0; i < arvore->num_filhos; i++) {
         if (arvore->filhos[i] != NULL) {
