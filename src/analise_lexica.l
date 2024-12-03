@@ -57,8 +57,6 @@ E_LOGICO            "&&"
 OU_LOGICO           "||"
 NOT_LOGICO          "!"
 
-STRUCT              struct
-ENUM                enum
 DEFINE              #define
 INCLUDE             #include
 
@@ -80,9 +78,9 @@ OP_ARITMETICO       ({SOMA}|{MULTIPLICACAO}|{DIVISAO}|{SUBTRACAO})
 OP_RELACIONAL       ({IGUAL}|{DIFERENTE}|{MAIOR}|{MENOR}|{MAIOR_IGUAL}|{MENOR_IGUAL})
 OP_LOGICO           ({E_LOGICO}|{OU_LOGICO}|{E_LOGICO})
 
-ERRO1_1             [!#@$%&*,.;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRING}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT})
-ERRO1_2             ({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT}|{STRING})[!#@$%&*,;<>^~=|]+
-ERRO1_3             [!#@$%&*,;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRUCT}|{ENUM}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT}|{STRING})[!#@$%&*,;<>^~0-9=|]+
+ERRO1_1             [!#@$%&*,.;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{STRING}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT})
+ERRO1_2             ({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT}|{STRING})[!#@$%&*,;<>^~=|]+
+ERRO1_3             [!#@$%&*,;<>:^~0-9=|]+({IF}|{ELSE}|{WHILE}|{FOR}|{DO}|{RETURN}|{INT}|{FLOAT}|{CHAR}|{VOID}|{PRINT}|{SCAN}|{SWITCH}|{CASE}|{BREAK}|{DEFAULT}|{STRING})[!#@$%&*,;<>^~0-9=|]+
 ERRO1_4_1           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE}))
 ERRO1_4_2           (({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~0-9=|]+)
 ERRO1_4_3           ([!#@$%&*,.;<>:^~0-9=|]+({DEFINE}|{INCLUDE})[!#@$%&*,.;<>:^~0-9=|]+)
@@ -123,8 +121,6 @@ ERRO3_OP            ({ERRO3_ARITMETICO}|{ERRO3_RELACIONAL}|{ERRO3_LOGICO})
 {VOID}              {inserirReservada(yytext, R);   return VOID;}
 {STRING}            {inserirReservada(yytext, R);   return STRING;}
 
-{STRUCT}            {inserirReservada(yytext, R);   return STRUCT;}
-{ENUM}              {inserirReservada(yytext, R);   return ENUM;}
 {DEFINE}            {inserirReservada(yytext, R);   return DEFINE;}
 {INCLUDE}           {inserirReservada(yytext, R);   return INCLUDE;}
 

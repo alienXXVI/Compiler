@@ -67,33 +67,31 @@ extern int yydebug;
      CHAR = 276,
      VOID = 277,
      STRING = 278,
-     STRUCT = 279,
-     ENUM = 280,
-     DEFINE = 281,
-     INCLUDE = 282,
-     SCAN = 283,
-     PRINT = 284,
-     SOMA = 285,
-     MULTIPLICACAO = 286,
-     DIVISAO = 287,
-     SUBTRACAO = 288,
-     RECEBE = 289,
-     IGUAL = 290,
-     DIFERENTE = 291,
-     MAIOR = 292,
-     MENOR = 293,
-     MAIOR_IGUAL = 294,
-     MENOR_IGUAL = 295,
-     E_LOGICO = 296,
-     OU_LOGICO = 297,
-     NOT_LOGICO = 298,
-     ABRE_P = 299,
-     FECHA_P = 300,
-     ABRE_CH = 301,
-     FECHA_CH = 302,
-     VIRGULA = 303,
-     DOIS_PONTOS = 304,
-     PONTO_VIRGULA = 305
+     DEFINE = 279,
+     INCLUDE = 280,
+     SCAN = 281,
+     PRINT = 282,
+     SOMA = 283,
+     MULTIPLICACAO = 284,
+     DIVISAO = 285,
+     SUBTRACAO = 286,
+     RECEBE = 287,
+     IGUAL = 288,
+     DIFERENTE = 289,
+     MAIOR = 290,
+     MENOR = 291,
+     MAIOR_IGUAL = 292,
+     MENOR_IGUAL = 293,
+     E_LOGICO = 294,
+     OU_LOGICO = 295,
+     NOT_LOGICO = 296,
+     ABRE_P = 297,
+     FECHA_P = 298,
+     ABRE_CH = 299,
+     FECHA_CH = 300,
+     VIRGULA = 301,
+     DOIS_PONTOS = 302,
+     PONTO_VIRGULA = 303
    };
 #endif
 
@@ -110,7 +108,7 @@ typedef union YYSTYPE
 
 
 /* Line 2058 of yacc.c  */
-#line 114 "analise_sintatica.tab.h"
+#line 112 "analise_sintatica.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
