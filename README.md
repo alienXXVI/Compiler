@@ -989,7 +989,7 @@ No main, as tabelas de símbolos e de palavras reservadas continuam sendo impres
 Para compilar, é recomendado estar na pasta de caminho:
 
 ```c
-cd C:\Users\alian\Documents\AlianaArquivos\UNIOESTE\3ANO\Compiladores\Trabalho2\Trabalho\src
+cd C:\Users\...\Trabalho\src
 ```
 <br>
 
@@ -1002,7 +1002,7 @@ Por fim, os códigos em .c são compilados e o executável é gerado, em “.\g�
 ```c
 yacc -d analise_sintatica.y
 lex analise_lexica.l
-gcc (Get-ChildItem -Recurse -Path "C:\Users\alian\Documents\AlianaArquivos\UNIOESTE\3ANO\Compiladores\Trabalho2\Trabalho" -Filter "*.c").FullName -o gçç
+gcc (Get-ChildItem -Recurse -Path "C:\Users\...\Trabalho" -Filter "*.c").FullName -o gçç
 ```
 <br>
 
